@@ -45,7 +45,9 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers("/api/v1/users/**").permitAll()
+                        .requestMatchers("/api/v1/categories/**").permitAll()
+                        .requestMatchers("/api/v1/products/**").permitAll()
+                        .requestMatchers("/api/v1/users/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .httpBasic((basicSecurity) -> basicSecurity
@@ -59,6 +61,7 @@ public class SecurityConfig {
         return http.build();
     }
 
+
     @Bean
     public UserDetailsService userDetailsService() {
         CustomUserDetailsServer customerDetails = new CustomUserDetailsServer(userService);
@@ -66,7 +69,7 @@ public class SecurityConfig {
         User admin1 = User.builder()
                 .username("admin1")
                 .email("admin1@mail.com")
-                .password("$2a$08$E.YB53P9QWAhOHNh7hqoyeJk9wsknb9wH8l4rPVIT6dHMPzMqJNhy") // 123451
+                .password("$2a$08$E.YB53P9QWAhOHNh7hqoyeJk9wsknb9wH8l4rPVIT6dHMPzMqJNhy") // 12345
                 .role(Role.ROLE_ADMIN)
                 .build();
 
@@ -110,7 +113,7 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(4);
+        return new BCryptPasswordEncoder(8);
     }
 
 }

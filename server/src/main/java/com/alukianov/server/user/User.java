@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Parameter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,15 +22,7 @@ import java.util.Collections;
 public class User implements UserDetails {
 
     @Id
-    @GeneratedValue(generator = "sequence-generator")
-    @GenericGenerator(
-            name = "sequence-generator",
-            parameters = {
-                    @Parameter(name = "sequence_name", value = "client_sequence"),
-                    @Parameter(name = "initial_value", value = "0"),
-                    @Parameter(name = "increment_size", value = "1")
-            }
-    )
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String username;
@@ -46,6 +36,9 @@ public class User implements UserDetails {
 
     @Column(name = "created_at")
     private LocalDateTime createAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

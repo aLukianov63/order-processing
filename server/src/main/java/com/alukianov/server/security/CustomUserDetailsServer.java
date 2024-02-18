@@ -28,6 +28,7 @@ public class CustomUserDetailsServer implements UserDetailsService {
 
     public void startInit(User... users) {
         for (User user : users) {
+            if (userService.findByUsername(user.getUsername()).isPresent()) continue;
             userService.save(user);
         }
     }
