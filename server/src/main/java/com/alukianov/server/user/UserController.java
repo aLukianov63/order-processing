@@ -1,10 +1,10 @@
 package com.alukianov.server.user;
 
+import com.alukianov.server.basket.BasketService;
 import com.alukianov.server.utils.ServerResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +19,7 @@ import java.util.Optional;
 public class UserController {
 
     private final UserService userService;
+    private final BasketService basketService;
 
     @GetMapping
     private ResponseEntity<ServerResponse> findAllUsers() {
@@ -55,6 +56,21 @@ public class UserController {
                         .message("Current user")
                         .payload(principal)
                         .build());
+    }
+
+    @GetMapping(value = "/{id}/basket")
+    private ResponseEntity<ServerResponse> findUserBasket(@PathVariable Long id) {
+        Optional<User> user = userService.findById(id);
+
+        return user.map(value -> ResponseEntity.ok(ServerResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("User with id: " + id)
+                .payload(basketService.findBasketByUser(value))
+                .build())).orElseGet(() -> new ResponseEntity<>(ServerResponse.builder()
+                .status(HttpStatus.NOT_FOUND.value())
+                .message("User with id " + id + " not found")
+                .build(),
+                HttpStatus.NOT_FOUND));
     }
 
 }

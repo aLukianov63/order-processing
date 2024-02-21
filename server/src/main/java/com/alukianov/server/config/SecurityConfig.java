@@ -47,7 +47,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/api/v1/categories/**").permitAll()
                         .requestMatchers("/api/v1/products/**").permitAll()
-                        .requestMatchers("/api/v1/users/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/users/me").authenticated()
+                        .requestMatchers("/api/v1/users/*/basket").authenticated()
+                        .requestMatchers("/api/v1/users", "/api/v1/users/").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .httpBasic((basicSecurity) -> basicSecurity
