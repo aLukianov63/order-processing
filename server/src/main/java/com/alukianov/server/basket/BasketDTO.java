@@ -11,8 +11,8 @@ public record BasketDTO(
         Long id,
         Long ownerId,
         List<BasketItemResponse> basketItems,
+        Double totalPrice,
         String createdAt,
-
         String updatedAt
 ) {
 }

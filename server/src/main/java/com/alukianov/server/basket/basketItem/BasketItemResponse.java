@@ -10,7 +10,7 @@ public record BasketItemResponse(
         Long id,
         Product product,
         Integer quantity,
-
+        Double totalPrice,
         LocalDateTime createdAt
 ) {
 }
