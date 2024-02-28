@@ -1,6 +1,7 @@
 package com.alukianov.server.basket.basketItem;
 
 import com.alukianov.server.basket.BasketRepository;
+import com.alukianov.server.product.Product;
 import com.alukianov.server.product.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,8 +23,14 @@ public class BasketItemService {
             throw new RuntimeException("Not found");
         }
 
+        Product product = productRepository.findById(basketItemRequest.productId()).get();
+
+        if (product.getInventory().getQuantity() < basketItemRequest.quantity()) {
+            throw new RuntimeException("There is no given quantity of goods");
+        }
+
         BasketItem basketItem = BasketItem.builder()
-                .product(productRepository.findById(basketItemRequest.productId()).get())
+                .product(product)
                 .basket(basketRepository.findById(basketItemRequest.basketId()).get())
                 .quantity(basketItemRequest.quantity())
                 .createAt(LocalDateTime.now())

@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
@@ -45,11 +46,16 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers("/api/v1/categories/**").permitAll()
-                        .requestMatchers("/api/v1/products/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/v1/categories/**").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/v1/categories/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET,"/api/v1/products/**").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/v1/products/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/users/me").authenticated()
                         .requestMatchers("/api/v1/users/*/basket").authenticated()
                         .requestMatchers("/api/v1/users", "/api/v1/users/").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/basketItems").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/orders").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/orders/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .httpBasic((basicSecurity) -> basicSecurity
@@ -62,7 +68,6 @@ public class SecurityConfig {
 
         return http.build();
     }
-
 
     @Bean
     public UserDetailsService userDetailsService() {

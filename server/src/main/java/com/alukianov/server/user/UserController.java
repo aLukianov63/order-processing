@@ -49,6 +49,7 @@ public class UserController {
                     HttpStatus.NOT_FOUND);
     }
 
+    // TODO Principal is not User class request
     @GetMapping(value = "/me")
     private ResponseEntity<ServerResponse> findMe(Principal principal) {
         return ResponseEntity.ok(ServerResponse.builder()
