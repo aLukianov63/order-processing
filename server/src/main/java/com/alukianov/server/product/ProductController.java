@@ -1,6 +1,7 @@
 package com.alukianov.server.product;
 
 import com.alukianov.server.utils.ServerResponse;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,7 +47,7 @@ public class ProductController {
     private ResponseEntity<ServerResponse> saveProduct(@RequestBody ProductDTO productDTO) {
         try {
             productService.save(productDTO);
-        } catch (RuntimeException exception) {
+        } catch (EntityNotFoundException exception) {
             return new ResponseEntity<>(ServerResponse.builder()
                         .status(HttpStatus.NOT_FOUND.value())
                         .message(exception.getMessage())

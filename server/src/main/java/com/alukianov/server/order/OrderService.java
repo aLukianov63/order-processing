@@ -3,6 +3,7 @@ package com.alukianov.server.order;
 import com.alukianov.server.basket.Basket;
 import com.alukianov.server.basket.BasketRepository;
 import com.alukianov.server.basket.basketItem.BasketItemRepository;
+import com.alukianov.server.exception.BasketEmptyException;
 import com.alukianov.server.order.orderDetails.OrderDetails;
 import com.alukianov.server.order.orderDetails.OrderDetailsRepository;
 import com.alukianov.server.order.orderLine.OrderLine;
@@ -11,6 +12,7 @@ import com.alukianov.server.product.inventory.Inventory;
 import com.alukianov.server.product.inventory.InventoryRepository;
 import com.alukianov.server.user.User;
 import com.alukianov.server.user.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -34,14 +36,14 @@ public class OrderService {
         Optional<User> temp = userRepository.findById(ordersRequest.userId());
 
         if (temp.isEmpty()) {
-            throw new RuntimeException("User with id " + ordersRequest.userId() + " not found");
+            throw new EntityNotFoundException("User with id " + ordersRequest.userId() + " not found!");
         }
 
         User user = temp.get();
         Basket basket = basketRepository.findByOwner(user).get();
 
         if (basketItemRepository.findAllByBasket(basket).isEmpty()) {
-            throw new RuntimeException("User basket us empty");
+            throw new BasketEmptyException("Basket is empty!");
         }
 
         OrderDetails orderDetails = OrderDetails.builder()

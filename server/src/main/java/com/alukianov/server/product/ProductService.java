@@ -2,6 +2,7 @@ package com.alukianov.server.product;
 
 import com.alukianov.server.product.category.CategoryRepository;
 import com.alukianov.server.product.inventory.Inventory;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +21,7 @@ public class ProductService {
     public Product save(ProductDTO productDTO) {
 
         if (categoryRepository.findById(productDTO.categoryId()).isEmpty()) {
-            throw new RuntimeException("Category with id " + productDTO.categoryId() + " not found");
+            throw new EntityNotFoundException("Category with id " + productDTO.categoryId() + " not found");
         }
 
         Product product = Product.builder()

@@ -1,8 +1,10 @@
 package com.alukianov.server.basket.basketItem;
 
 import com.alukianov.server.basket.BasketRepository;
+import com.alukianov.server.exception.QuantityMissingException;
 import com.alukianov.server.product.Product;
 import com.alukianov.server.product.ProductRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,13 +22,16 @@ public class BasketItemService {
 
         if (basketRepository.findById(basketItemRequest.basketId()).isEmpty() ||
                 productRepository.findById(basketItemRequest.productId()).isEmpty()) {
-            throw new RuntimeException("Not found");
+
+            throw new EntityNotFoundException("Product with is " + basketItemRequest.productId() + " not found!");
         }
 
         Product product = productRepository.findById(basketItemRequest.productId()).get();
 
         if (product.getInventory().getQuantity() < basketItemRequest.quantity()) {
-            throw new RuntimeException("There is no given quantity of goods");
+            throw new QuantityMissingException(
+                    "The desired quantity of product with id " + basketItemRequest.productId()  + " is missing"
+            );
         }
 
         BasketItem basketItem = BasketItem.builder()

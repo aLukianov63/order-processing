@@ -1,6 +1,8 @@
 package com.alukianov.server.basket.basketItem;
 
+import com.alukianov.server.exception.QuantityMissingException;
 import com.alukianov.server.utils.ServerResponse;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +19,7 @@ public class BasketItemController {
     private ResponseEntity<ServerResponse> saveBasketItem(@RequestBody BasketItemRequest basketItemRequest) {
         try {
             basketItemService.save(basketItemRequest);
-        } catch (RuntimeException exception) {
+        } catch (EntityNotFoundException | QuantityMissingException exception) {
             return new ResponseEntity<>(ServerResponse.builder()
                     .status(HttpStatus.NOT_FOUND.value())
                     .message(exception.getMessage())
