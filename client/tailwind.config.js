@@ -9,6 +9,9 @@ module.exports = {
     ],
     prefix: "",
     theme: {
+        fontFamily: {
+            app: ["JetBrains Mono"],
+        },
         container: {
             center: true,
             padding: "2rem",

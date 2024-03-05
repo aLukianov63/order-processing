@@ -57,6 +57,7 @@ public class AuthController {
         return ResponseEntity.ok(ServerResponse.builder()
                 .status(HttpStatus.OK.value())
                 .message("Success authentication!")
+                .payload(user)
                 .build()
         );
     }
@@ -90,6 +91,7 @@ public class AuthController {
         return ResponseEntity.ok(ServerResponse.builder()
                 .status(HttpStatus.OK.value())
                 .message("Success authentication!")
+                .payload(user)
                 .build()
         );
     }
