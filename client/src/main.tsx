@@ -9,6 +9,9 @@ import SignInPage from "./pages/SignInPage.tsx";
 import SignUpPage from "./pages/SignUpPage.tsx";
 import AuthProvider from "./components/AuthProvider.tsx";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
+import OrdersAdminPage from "./pages/OrdersAdminPage.tsx";
+import UserProfilePage from "./pages/UserProfilePage.tsx";
+import UserBasketPage from "./pages/UserBasketPage.tsx";
 
 const router = createBrowserRouter([
     {
@@ -26,6 +29,18 @@ const router = createBrowserRouter([
     {
         path: "/auth/signup",
         element: <SignUpPage/>,
+    },
+    {
+        path: "/admin/orders",
+        element: <OrdersAdminPage/>,
+    },
+    {
+        path: "/users/me",
+        element: <UserProfilePage/>,
+    },
+    {
+        path: "/users/me/busket",
+        element: <UserBasketPage/>,
     },
 ]);
 

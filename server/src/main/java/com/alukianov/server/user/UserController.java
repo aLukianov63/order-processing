@@ -1,6 +1,7 @@
 package com.alukianov.server.user;
 
 import com.alukianov.server.basket.BasketService;
+import com.alukianov.server.order.OrderService;
 import com.alukianov.server.utils.ServerResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,7 @@ public class UserController {
 
     private final UserService userService;
     private final BasketService basketService;
+    private final OrderService orderService;
 
     @GetMapping
     private ResponseEntity<ServerResponse> findAllUsers() {
@@ -66,6 +68,21 @@ public class UserController {
                 .status(HttpStatus.OK.value())
                 .message("User with id: " + id)
                 .payload(basketService.findBasketByUser(value))
+                .build())).orElseGet(() -> new ResponseEntity<>(ServerResponse.builder()
+                .status(HttpStatus.NOT_FOUND.value())
+                .message("User with id " + id + " not found")
+                .build(),
+                HttpStatus.NOT_FOUND));
+    }
+
+    @GetMapping(value = "/{id}/orders")
+    private ResponseEntity<ServerResponse> findUserOrders(@PathVariable Long id) {
+        Optional<User> user = userService.findById(id);
+
+        return user.map(value -> ResponseEntity.ok(ServerResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("User with id: " + id)
+                .payload(orderService.findAllOrdersByUser(value))
                 .build())).orElseGet(() -> new ResponseEntity<>(ServerResponse.builder()
                 .status(HttpStatus.NOT_FOUND.value())
                 .message("User with id " + id + " not found")

@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @Entity
 @Builder
@@ -24,8 +26,10 @@ public class OrderDetails {
 
     private String mobilePhone;
 
-    private String email;
-
     private String deliveryProviderUrl;
+
+    private String message;
+
+    private String deliveryDate;
 
 }

@@ -4,6 +4,7 @@ import com.alukianov.server.basket.Basket;
 import com.alukianov.server.basket.BasketRepository;
 import com.alukianov.server.basket.basketItem.BasketItemRepository;
 import com.alukianov.server.exception.BasketEmptyException;
+import com.alukianov.server.exception.OrderNotFoundException;
 import com.alukianov.server.order.orderDetails.OrderDetails;
 import com.alukianov.server.order.orderDetails.OrderDetailsRepository;
 import com.alukianov.server.order.orderLine.OrderLine;
@@ -12,9 +13,14 @@ import com.alukianov.server.product.inventory.Inventory;
 import com.alukianov.server.product.inventory.InventoryRepository;
 import com.alukianov.server.user.User;
 import com.alukianov.server.user.UserRepository;
+import com.alukianov.server.utils.EmailService;
+import com.alukianov.server.utils.EmailServiceImpl;
+import com.alukianov.server.utils.SimpleMessage;
+import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.context.Context;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,6 +37,7 @@ public class OrderService {
     private final OrderLineRepository orderLineRepository;
     private final OrderDetailsRepository orderDetailsRepository;
     private final InventoryRepository inventoryRepository;
+    private final EmailServiceImpl emailService;
 
     public Order save(OrdersRequest ordersRequest) {
         Optional<User> temp = userRepository.findById(ordersRequest.userId());
@@ -49,7 +56,6 @@ public class OrderService {
         OrderDetails orderDetails = OrderDetails.builder()
                 .contactPerson(ordersRequest.person())
                 .deliveryAddress(ordersRequest.address())
-                .email(ordersRequest.email())
                 .mobilePhone(ordersRequest.phoneNumber())
                 .build();
         List<OrderLine> lines = basketItemRepository.findAllByBasket(basket).stream().map(item ->
@@ -74,6 +80,24 @@ public class OrderService {
         basketItemRepository.removeByBasket(basket);
         updateInventory(lines);
 
+        Thread thread = new Thread(() -> {
+            Context context = new Context();
+            context.setVariable("orderId", order.getId());
+            try {
+                emailService.sendMimeMessage(SimpleMessage.builder()
+                                .to(user.getEmail())
+                                .subject("Покупка на shop-name!!")
+                                .build(),
+                        context
+                );
+            } catch (MessagingException exception) {
+                exception.printStackTrace();
+            }
+        });
+        thread.start();
+
+
+
         return order;
     }
 
@@ -83,6 +107,26 @@ public class OrderService {
 
     public Optional<Order> findById(Long id) {
         return orderRepository.findById(id);
+    }
+
+    public List<Order> findAllOrdersByUser(User user) {
+        return orderRepository.findAllByOwner(user);
+    }
+
+    public void updateOrderById(Long id, UpdateOrder model) {
+        Optional<Order> temp = findById(id);
+
+        if (temp.isEmpty()) {
+            throw new OrderNotFoundException("Order with id " + id  + " not found!");
+        }
+        Order order = temp.get();
+
+        order.setOrderStatus(OrderStatus.valueOf(model.status()));
+        order.setUpdatedAt(LocalDateTime.now());
+        order.getDetails().setMessage(model.message());
+        order.getDetails().setDeliveryDate(model.deliveryDate());
+
+        orderRepository.save(order);
     }
 
     private void updateInventory(List<OrderLine> lines) {

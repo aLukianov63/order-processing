@@ -1,6 +1,7 @@
 package com.alukianov.server.order;
 
 import com.alukianov.server.exception.BasketEmptyException;
+import com.alukianov.server.exception.OrderNotFoundException;
 import com.alukianov.server.utils.ServerResponse;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 @RestController
@@ -60,6 +62,22 @@ public class OrderController {
 
     }
 
-    // TODO this entity need update mechanic (status and handler)!!
+    @PutMapping("/{id}")
+    private ResponseEntity<ServerResponse> updateOrderById(@PathVariable Long id, @RequestBody UpdateOrder model) {
+        try {
+            orderService.updateOrderById(id, model);
+        } catch (OrderNotFoundException exception) {
+            return new ResponseEntity<>(ServerResponse.builder()
+                    .status(HttpStatus.NOT_FOUND.value())
+                    .message(exception.getLocalizedMessage())
+                    .build(),
+                    HttpStatus.NOT_FOUND);
+        }
+        return ResponseEntity.ok(ServerResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("Order updated!")
+                .build());
+    }
+
 
 }

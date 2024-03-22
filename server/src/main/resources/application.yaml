@@ -1,6 +1,17 @@
 spring:
   application:
     name: server
+  mail:
+    host: smtp.timeweb.ru
+    username: no-reply@mwps.ru
+    password: GtE64kX(DT\~3|
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
   datasource:
     url: jdbc:postgresql://localhost:30070/data
     password: admin

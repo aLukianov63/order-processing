@@ -8,7 +8,6 @@ type AuthProviderProps = PropsWithChildren;
 
 export default function AuthProvider({children}: AuthProviderProps) {
     const user = useClientStorage((state) => state.user);
-    console.log(user);
 
     return <AuthContext.Provider value={user}>{children}</AuthContext.Provider>;
 }

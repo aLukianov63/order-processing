@@ -52,6 +52,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,"/api/v1/products/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/users/me").authenticated()
                         .requestMatchers("/api/v1/users/*/basket").authenticated()
+                        .requestMatchers("/api/v1/users/*/orders").authenticated()
                         .requestMatchers("/api/v1/users", "/api/v1/users/").hasRole("ADMIN")
                         .requestMatchers("/api/v1/basketItems").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/v1/orders").authenticated()
@@ -97,7 +98,7 @@ public class SecurityConfig {
 
         configuration.setAllowCredentials(true);
         configuration.setAllowedOrigins(allowedOrigins);
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "UPDATE"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "PUT", "UPDATE"));
         configuration.setAllowedHeaders(
                 Arrays.asList("Origin", "Content-Type", "Accept", "responseType", "Authorization")
         );
