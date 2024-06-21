@@ -1,6 +1,5 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "./ui/badge";
-import { Button } from "./ui/button";
 
 type Props = {
   title: string;
@@ -10,7 +9,7 @@ type Props = {
   categoryName: string;
 };
 
-const BusketItem = ({ title, image, price, quantity, categoryName }: Props) => {
+const OrderItem = ({ title, image, price, quantity, categoryName }: Props) => {
   return (
     <Card className="flex justify-between w-[500px] h-[100px] p-2">
       <div className="flex flex-row gap-2">
@@ -26,14 +25,10 @@ const BusketItem = ({ title, image, price, quantity, categoryName }: Props) => {
         </div>
       </div>
       <div className="flex flex-row gap-2">
-        <Button className="h-[30px] w-[30px]">-</Button>
-        <div className="border border-zinc-900 h-[30px] w-[30px] rounded-lg px-[9px] py-0.5">
-          <p>{quantity}</p>
-        </div>
-        <Button className="h-[30px] w-[30px]">+</Button>
+        <p className="text-lg">Количество: {quantity}</p>
       </div>
     </Card>
   );
 };
 
-export default BusketItem;
+export default OrderItem;

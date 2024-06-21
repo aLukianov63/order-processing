@@ -9,11 +9,11 @@ import com.alukianov.server.order.orderDetails.OrderDetails;
 import com.alukianov.server.order.orderDetails.OrderDetailsRepository;
 import com.alukianov.server.order.orderLine.OrderLine;
 import com.alukianov.server.order.orderLine.OrderLineRepository;
+import com.alukianov.server.payment.YooKassaService;
 import com.alukianov.server.product.inventory.Inventory;
 import com.alukianov.server.product.inventory.InventoryRepository;
 import com.alukianov.server.user.User;
 import com.alukianov.server.user.UserRepository;
-import com.alukianov.server.utils.EmailService;
 import com.alukianov.server.utils.EmailServiceImpl;
 import com.alukianov.server.utils.SimpleMessage;
 import jakarta.mail.MessagingException;
@@ -22,9 +22,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
 @Service
 @RequiredArgsConstructor
@@ -40,10 +43,10 @@ public class OrderService {
     private final EmailServiceImpl emailService;
 
     public Order save(OrdersRequest ordersRequest) {
-        Optional<User> temp = userRepository.findById(ordersRequest.userId());
+        Optional<User> temp = userRepository.findById(ordersRequest.getUserId());
 
         if (temp.isEmpty()) {
-            throw new EntityNotFoundException("User with id " + ordersRequest.userId() + " not found!");
+            throw new EntityNotFoundException("User with id " + ordersRequest.getUserId() + " not found!");
         }
 
         User user = temp.get();
@@ -54,13 +57,14 @@ public class OrderService {
         }
 
         OrderDetails orderDetails = OrderDetails.builder()
-                .contactPerson(ordersRequest.person())
-                .deliveryAddress(ordersRequest.address())
-                .mobilePhone(ordersRequest.phoneNumber())
+                .contactPerson(ordersRequest.getPerson())
+                .deliveryAddress(ordersRequest.getAddress())
+                .mobilePhone(ordersRequest.getPhoneNumber())
                 .build();
         List<OrderLine> lines = basketItemRepository.findAllByBasket(basket).stream().map(item ->
                 orderLineRepository.save(OrderLine.builder()
                         .product(item.getProduct())
+                        .totalPrice(item.getQuantity() * item.getProduct().getPrice())
                         .quantity(item.getQuantity())
                         .updatedAt(LocalDateTime.now())
                         .createAt(LocalDateTime.now())
@@ -72,9 +76,12 @@ public class OrderService {
                 .owner(user)
                 .details(orderDetails)
                 .lines(lines)
+                .totalPrice(lines.stream().mapToDouble(OrderLine::getTotalPrice).sum())
                 .createAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
-                .orderStatus(OrderStatus.IN_PROCESSING)
+                .orderStatus(OrderStatus.CREATED)
+                .isProcessed(false)
+                .payId(ordersRequest.payId)
                 .build());
 
         basketItemRepository.removeByBasket(basket);
@@ -95,8 +102,6 @@ public class OrderService {
             }
         });
         thread.start();
-
-
 
         return order;
     }
@@ -125,6 +130,45 @@ public class OrderService {
         order.setUpdatedAt(LocalDateTime.now());
         order.getDetails().setMessage(model.message());
         order.getDetails().setDeliveryDate(model.deliveryDate());
+
+        orderRepository.save(order);
+    }
+
+    public Order canselOrder(Long id) {
+        Optional<Order> temp = findById(id);
+
+        if (temp.isEmpty()) {
+            throw new OrderNotFoundException("Order with id " + id  + " not found!");
+        }
+        Order order = temp.get();
+        order.setOrderStatus(OrderStatus.CANCELED);
+        order.setUpdatedAt(LocalDateTime.now());
+        order.getDetails().setMessage("Заказ отменён!");
+        order.getDetails().setDeliveryDate("Заказ отменён!");
+
+        orderRepository.save(order);
+
+        return order;
+    }
+
+    public void processOrder(Long adminId, Long orderId) {
+        Optional<Order> orderTemp = findById(orderId);
+
+        if (orderTemp.isEmpty()) {
+            throw new OrderNotFoundException("Order with id " + id  + " not found!");
+        }
+        Order order = orderTemp.get();
+
+        Optional<User> temp = userRepository.findById(adminId);
+
+        if (temp.isEmpty()) {
+            throw new EntityNotFoundException("User with id " + adminId + " not found!");
+        }
+        User user = temp.get();
+
+        order.setAdmin(user);
+        order.setIsProcessed(true);
+        order.setOrderStatus(OrderStatus.PROCESSED);
 
         orderRepository.save(order);
     }

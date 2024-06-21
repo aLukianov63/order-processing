@@ -1,10 +1,15 @@
 package com.alukianov.server.order;
 
-public record OrdersRequest(
-        Long userId,
-        String person,
-        String address,
-        String phoneNumber,
-        String email
-) {
+import lombok.Builder;
+import lombok.Data;
+
+@Builder
+@Data
+public class OrdersRequest  {
+        Long userId;
+        String person;
+        String address;
+        String phoneNumber;
+        String email;
+        String payId;
 }

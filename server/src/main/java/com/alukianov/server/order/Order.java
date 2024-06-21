@@ -28,6 +28,14 @@ public class Order {
     @JoinColumn(name = "user_id")
     private User owner;
 
+    @ManyToOne
+    @JoinColumn(name = "admin_id")
+    private User admin;
+
+    private String payId;
+
+    private Boolean isProcessed;
+
     @OneToOne
     @JoinColumn(name = "details_id")
     private OrderDetails details;
@@ -38,6 +46,8 @@ public class Order {
 
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
+
+    private Double totalPrice;
 
     @Column(name = "created_at")
     private LocalDateTime createAt;

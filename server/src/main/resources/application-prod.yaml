@@ -2,9 +2,9 @@ spring:
   application:
     name: server
   mail:
-    host: smtp.timeweb.ru
-    username: no-reply@mwps.ru
-    password: GtE64kX(DT\~3|
+    host: ${SMTP_HOST}
+    username: ${SMTP_USER}
+    password: ${SMTP_PASS}
     properties:
       mail:
         smtp:
@@ -13,14 +13,14 @@ spring:
             enable: true
             required: true
   datasource:
-    url: jdbc:postgresql://localhost:30070/data
-    password: admin
-    username: admin
+    url: ${PG_LINK}
+    password: ${PG_PASS}
+    username: ${PG_USER}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: false
+    show-sql: true
     properties:
       hibernate:
         format_sql: true
@@ -30,10 +30,10 @@ server:
   port: 8081
 settings:
   security:
-    allowed-origins: http://localhost:5173/
+    allowed-origins: ${CORS_ORIGINS}
   application:
-    default-avatar: https://t3.ftcdn.net/jpg/05/87/76/66/360_F_587766653_PkBNyGx7mQh9l1XXPtCAq1lBgOsLl6xH.jpg
+    default-avatar: https://data.mwps.ru/default-avatar.png
 
 yookassa:
-  shopId: 395360
-  secretKey: test_8_ut_yE3LGWIMyvYFQqPlGSTFiVy_XEVmQJBaht1xaw
+  shopId: ${SHOP_ID}
+  secretKey: ${SHOP_SECRET}

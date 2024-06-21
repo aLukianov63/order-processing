@@ -27,6 +27,8 @@ public class OrderLine {
 
     private Integer quantity;
 
+    private Double totalPrice;
+
     @Column(name = "created_at")
     private LocalDateTime createAt;
 

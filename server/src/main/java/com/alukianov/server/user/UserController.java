@@ -24,7 +24,7 @@ public class UserController {
     private final OrderService orderService;
 
     @GetMapping
-    private ResponseEntity<ServerResponse> findAllUsers() {
+    public ResponseEntity<ServerResponse> findAllUsers() {
         return ResponseEntity.ok(ServerResponse.builder()
                         .status(HttpStatus.OK.value())
                         .message("All users list")
@@ -34,7 +34,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/{id}")
-    private ResponseEntity<ServerResponse> findUserById(@PathVariable Long id) {
+    public ResponseEntity<ServerResponse> findUserById(@PathVariable Long id) {
         Optional<User> user = userService.findById(id);
 
         if (user.isPresent()) {
@@ -52,7 +52,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/me")
-    private ResponseEntity<ServerResponse> findMe(Principal principal) {
+    public ResponseEntity<ServerResponse> findMe(Principal principal) {
         return ResponseEntity.ok(ServerResponse.builder()
                         .status(HttpStatus.OK.value())
                         .message("Current user")
@@ -61,7 +61,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/{id}/basket")
-    private ResponseEntity<ServerResponse> findUserBasket(@PathVariable Long id) {
+    public ResponseEntity<ServerResponse> findUserBasket(@PathVariable Long id) {
         Optional<User> user = userService.findById(id);
 
         return user.map(value -> ResponseEntity.ok(ServerResponse.builder()
@@ -76,7 +76,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/{id}/orders")
-    private ResponseEntity<ServerResponse> findUserOrders(@PathVariable Long id) {
+    public ResponseEntity<ServerResponse> findUserOrders(@PathVariable Long id) {
         Optional<User> user = userService.findById(id);
 
         return user.map(value -> ResponseEntity.ok(ServerResponse.builder()

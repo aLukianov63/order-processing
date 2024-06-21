@@ -1,9 +1,10 @@
 package com.alukianov.server.order;
 
 public enum OrderStatus {
-    IN_PROCESSING,
-    ACCEPTED,
-    SENT,
-    DELIVERED,
-    CANCELED
+    CANCELED, // заказ отменён
+    CREATED, // заказ создан
+    PROCESSED, // заказ обработан
+    COLLECTED, // заказ собран
+    SENT, // заказ отправлен
+    RECEIVED // заказ получен
 }

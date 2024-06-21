@@ -2,6 +2,7 @@ package com.alukianov.server.order;
 
 import com.alukianov.server.exception.BasketEmptyException;
 import com.alukianov.server.exception.OrderNotFoundException;
+import com.alukianov.server.payment.YooKassaService;
 import com.alukianov.server.utils.ServerResponse;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
+import java.math.BigDecimal;
 import java.util.Optional;
 
 @RestController
@@ -18,6 +19,7 @@ import java.util.Optional;
 public class OrderController {
 
     private final OrderService orderService;
+    private final YooKassaService yooKassaService;
 
     @PostMapping
     private ResponseEntity<ServerResponse> saveOrder(@RequestBody OrdersRequest ordersRequest) {
@@ -79,5 +81,39 @@ public class OrderController {
                 .build());
     }
 
+    @PutMapping("/{id}/cansel")
+    private ResponseEntity<ServerResponse> updateOrderById(@PathVariable Long id) {
+        try {
+            Order order = orderService.canselOrder(id);
+            yooKassaService.refundPayment(order.getPayId(), new BigDecimal(order.getTotalPrice()), "RUB");
+        } catch (OrderNotFoundException exception) {
+            return new ResponseEntity<>(ServerResponse.builder()
+                    .status(HttpStatus.NOT_FOUND.value())
+                    .message(exception.getLocalizedMessage())
+                    .build(),
+                    HttpStatus.NOT_FOUND);
+        }
+        return ResponseEntity.ok(ServerResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("Order canceled!")
+                .build());
+    }
+
+    @PutMapping("/{id}/process")
+    private ResponseEntity<ServerResponse> processOrderById(@PathVariable Long id, @RequestBody ProcessOrder model) {
+        try {
+            orderService.processOrder(model.adminId(), id);
+        } catch (OrderNotFoundException exception) {
+            return new ResponseEntity<>(ServerResponse.builder()
+                    .status(HttpStatus.NOT_FOUND.value())
+                    .message(exception.getLocalizedMessage())
+                    .build(),
+                    HttpStatus.NOT_FOUND);
+        }
+        return ResponseEntity.ok(ServerResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("Order processed!")
+                .build());
+    }
 
 }

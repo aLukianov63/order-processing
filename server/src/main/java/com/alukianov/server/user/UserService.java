@@ -3,6 +3,7 @@ package com.alukianov.server.user;
 import com.alukianov.server.basket.Basket;
 import com.alukianov.server.basket.BasketRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,9 +18,13 @@ public class UserService {
 
     private final BasketRepository basketRepository;
 
+    @Value("#{'${settings.application.default-avatar}'}")
+    public String avatarImage;
+
     public User save(User user) {
         user.setCreateAt(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
+        user.setAvatarImage(avatarImage);
 
         Basket basket = Basket.builder()
                 .owner(user)
